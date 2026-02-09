@@ -1,28 +1,33 @@
 import Mathlib.Tactic
 
 
-noncomputable def nn
+noncomputable def kk
   (a : ℕ → ℝ)
   (h : ∀ N : ℕ, ∃ n : ℕ, N ≤ n ∧ a n ≠ a N)
-  (m : ℕ) : ℕ := match m with
+  (n : ℕ) : ℕ := match n with
   | 0 => 0
-  | k + 1 => (h (nn a h k)).choose
-
-variable (a : ℕ → ℝ)
-  (h : ∀ N : ℕ, ∃ n : ℕ, N ≤ n ∧ a n ≠ a N)
+  | m + 1 => (h (kk a h m)).choose
 
 theorem q3
   (a : ℕ → ℝ)
-  (nonincr : ∀ i : ℕ, a i ≥ a (i + 1))
+  (nonincr : ∀ i j : ℕ, i ≤ j → a j ≤ a i)
   (h : ∀ N : ℕ, ∃ n : ℕ, N ≤ n ∧ a n ≠ a N)
   : ∃ n : ℕ → ℕ,
-      ∀ i : ℕ, n i < n (i + 1) ∧ a (n i) ≤ a (n (i + 1)) := by
-  let n := nn a h
-  use n
+      ∀ i : ℕ, n i < n (i + 1) ∧ a (n (i+1)) ≤ a (n i) := by
+  use kk a h
   intro i
   constructor
-  sorry
-  sorry
+  · simp [kk]
+    apply lt_of_le_of_ne
+    exact (h (kk a h i)).choose_spec.1
+    intro h'
+    have := (h  (kk a h i)).choose_spec.2
+    apply this
+    apply_fun a at h'
+    symm
+    assumption
+  · apply nonincr
+    sorry
 
 /- ---------- -/
 
