@@ -1,11 +1,14 @@
 import Mathlib.Tactic
 
+
 @[ext]
 structure Mat where
   a : ℝ
   b : ℝ
   c : ℝ
   d : ℝ
+
+/- Operations -/
 
 def matPlus (A B : Mat) : Mat where
   a := A.a + B.a
@@ -29,28 +32,38 @@ def matNeg (A : Mat) : Mat where
   c := -A.c
   d := -A.d
 
+/- Instances -/
+
 instance : Add Mat where
   add := matPlus
 
 instance : Mul Mat where
   mul := matMult
 
-def mat_add_zero (A : Mat) : matPlus A matZero = A := by
+@[simp]
+lemma _add_plus (A B : Mat) : A + B = matPlus A B := by rfl
+
+@[simp]
+lemma _add_mult (A B : Mat) : A * B = matMult A B := by rfl
+
+/- Properties-/
+
+theorem mat_add_zero (A : Mat) : matPlus A matZero = A := by
   simp [matPlus, matZero]
 
-def mat_zero_add (A : Mat) : matPlus matZero A = A := by
+theorem mat_zero_add (A : Mat) : matPlus matZero A = A := by
   simp [matPlus, matZero]
 
-def mat_add_assoc (A B C : Mat)
+theorem mat_add_assoc (A B C : Mat)
   : matPlus (matPlus A B) C = matPlus A (matPlus B C) := by
   simp [matPlus]
   constructor <;> simp [add_assoc]
 
-def mat_add_comm (A B : Mat) : matPlus A B = matPlus B A := by
+theorem mat_add_comm (A B : Mat) : matPlus A B = matPlus B A := by
   simp [matPlus]
   constructor <;> simp [add_comm]
 
-def mat_mul_assoc (A B C : Mat)
+theorem mat_mul_assoc (A B C : Mat)
   : matMult (matMult A B) C = matMult A (matMult B C) := by
   -- ext <;> ( simp [matMult] ; ring )
   ext <;> (
@@ -63,7 +76,7 @@ def mat_mul_assoc (A B C : Mat)
     rw [← add_assoc, add_assoc]
   )
 
-def mat_left_distrib (A B C : Mat)
+theorem mat_left_distrib (A B C : Mat)
   : matMult A (matPlus B C) = matPlus (matMult A B) (matMult A C) := by
   ext <;> ( simp [matMult, matPlus] ; ring )
 
@@ -77,7 +90,11 @@ instance : Ring Mat where
   zero_add := mat_zero_add
   add_assoc := mat_add_assoc
   add_comm := mat_add_comm
-  mul_one := sorry
+  mul_one := sorry /- by
+    intro A
+    simp; unfold matMult
+    ext <;> ( simp; ring ) -/
+
   one_mul := sorry
   mul_zero := sorry
   zero_mul := sorry
